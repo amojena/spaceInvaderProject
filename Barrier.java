@@ -7,14 +7,14 @@ import javax.swing.JFrame;
 import java.awt.*;
 import java.awt.event.KeyListener;
 
-public class Invader 
+public class Barrier 
 {
-    public int xPos = 0;
-    public int yPos = 0;
+    public int xPos = 90;
+    public int yPos = 525;
     public boolean hit = false;
 
-    ImageIcon newImageSprite = new ImageIcon("cloudGuy.png");
+    ImageIcon newImageSprite = new ImageIcon("rainbow.png");
     Image representation = newImageSprite.getImage(); 
 
-    Invader(){}
+    Barrier(){}
 }

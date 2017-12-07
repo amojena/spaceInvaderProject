@@ -9,8 +9,8 @@ import java.awt.event.KeyListener;
 
 public class Herd 
 {
-    public int rowInv = 3;
-    public int colInv = 7;
+    public static int rowInv = 3;
+    public static int colInv = 7;
     private int factor = 1;
     private int changeY = 0;
     Invader[][] herd = new Invader[rowInv][colInv];
