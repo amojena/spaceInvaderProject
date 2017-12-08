@@ -39,17 +39,27 @@ public class game extends JPanel implements KeyListener, Runnable {
         Graphics2D g2 = (Graphics2D) g;
         ImageIcon newImageSprite = new ImageIcon("background.png");
         Image background = newImageSprite.getImage();
+        g.setColor(Color.white);
         g2.drawImage(background, 0,0, null);
         g2.drawImage(p.representation, p.xPos, Player.yPos, null);
-        g.setColor(Color.white);
-        g.drawString("Lives: " + Integer.toString(Player.lives), 10, 20);
-        g.drawString("Score: " + Integer.toString(score), 10, 40);
 
         generateBomb(g2);
         drawHerd(g2);
         drawBarriers(g2);
+
+        g.drawString("Lives: " + Integer.toString(Player.lives), 10, 20);
+        g.drawString("Score: " + Integer.toString(score), 10, 40);
+
         if(!game.play)
+        {
             g2.drawImage(game.gameover, WIDTH/2, 10, null);
+            newImageSprite = new ImageIcon("LOGO-GAME-OVER.png");
+            gameover = newImageSprite.getImage();
+            g2.drawImage(game.gameover, 20, 300, null);
+            g2.drawImage(game.gameover, 20, 350, null);
+            g2.drawImage(game.gameover, 20, 400, null);
+            
+        }
     }
     public void generateBomb(Graphics2D g2)
     {
@@ -63,25 +73,43 @@ public class game extends JPanel implements KeyListener, Runnable {
                 bombsOnScreen.add(new Bomb(h.herd[randomRow][randomCol]));
         }
 
+        Bomb tempBomb;
         for(int i = 0; i < bombsOnScreen.size(); i++)
         {
-            Bomb tempBomb = bombsOnScreen.elementAt(i);
+            tempBomb = bombsOnScreen.elementAt(i);
             int playerRange = 64;
-            int bombRange = 29;
-            int rightOfPlayer = p.xPos + playerRange;
-            int abovePlayer   = Player.yPos - playerRange;
+            int bombRange = 30;
             
             if (tempBomb != null) {
+                
+                for (int j = 0; j< 12; j++)
+                {
+                    if((b.barrier[j].yPos == tempBomb.yPos || b.barrier[j].yPos + 1 == tempBomb.yPos) && ((tempBomb.xPos >= b.barrier[j].xPos && tempBomb.xPos <= b.barrier[j].xPos + bombRange) || (tempBomb.xPos + 25 >= b.barrier[j].xPos && tempBomb.xPos + 25 <= b.barrier[j].xPos + bombRange)) && (!b.barrier[j].hit) && (!tempBomb.hit))
+                    {
+                        tempBomb.hit = true;
+                        b.barrier[j].hit = true;
+                    }
+                    if((b1.barrier[j].yPos == tempBomb.yPos || b1.barrier[j].yPos + 1 == tempBomb.yPos) && ((tempBomb.xPos >= b1.barrier[j].xPos && tempBomb.xPos <= b1.barrier[j].xPos + bombRange) || (tempBomb.xPos + 25 >= b1.barrier[j].xPos && tempBomb.xPos + 25 <= b1.barrier[j].xPos + bombRange)) && (!b1.barrier[j].hit) && (!tempBomb.hit))
+                        {
+                        tempBomb.hit = true;
+                        b1.barrier[j].hit = true;
+                    }
+                    if((b2.barrier[j].yPos == tempBomb.yPos || b2.barrier[j].yPos + 1 == tempBomb.yPos) && ((tempBomb.xPos >= b2.barrier[j].xPos && tempBomb.xPos <= b2.barrier[j].xPos + bombRange) || (tempBomb.xPos + 25 >= b2.barrier[j].xPos && tempBomb.xPos + 25 <= b2.barrier[j].xPos + bombRange))&& (!b2.barrier[j].hit) && (!tempBomb.hit))
+                        {
+                        tempBomb.hit = true;
+                        b2.barrier[j].hit = true;
+                    }
+                }
 
-                if(tempBomb.yPos > Player.yPos + 5 || tempBomb.hit)
-                    bombsOnScreen.remove(i);
+                if(tempBomb.yPos > Player.yPos + 15 || tempBomb.hit)
+                    tempBomb.hit = true;
 
                 else if(tempBomb.yPos >= Player.yPos -10 && (tempBomb.xPos >= p.xPos && (tempBomb.xPos + bombRange) <= p.xPos + playerRange))
                 {
                     tempBomb.hit = true;
-                    bombsOnScreen.remove(i);
                     Player.hit = true;
                     Player.lives--;
+                    p.xPos = game.WIDTH/2;
                     if(Player.lives == 0)
                     {
                         g2.drawString("Game over", 10, 50);
@@ -89,13 +117,15 @@ public class game extends JPanel implements KeyListener, Runnable {
                         break;
                     }
                 }
-
                 
-                else if (!tempBomb.hit)
+
+                if (!tempBomb.hit)
                 {
                     g2.drawImage(tempBomb.representation, tempBomb.xPos, tempBomb.yPos, null);
                     tempBomb.yPos += 2;
                 }
+                else
+                    bombsOnScreen.remove(i);
             }
         }
 
@@ -108,7 +138,7 @@ public class game extends JPanel implements KeyListener, Runnable {
             if (!b.barrier[i].hit)
                 g2.drawImage(b.barrier[i].representation, b.barrier[i].xPos, b.barrier[i].yPos, null);
             if (!b1.barrier[i].hit)
-               g2.drawImage(b1.barrier[i].representation, b1.barrier[i].xPos, b1.barrier[i].yPos, null);
+                g2.drawImage(b1.barrier[i].representation, b1.barrier[i].xPos, b1.barrier[i].yPos, null);
             if (!b2.barrier[i].hit)
                 g2.drawImage(b2.barrier[i].representation, b2.barrier[i].xPos, b2.barrier[i].yPos, null);
         }
@@ -166,7 +196,7 @@ public class game extends JPanel implements KeyListener, Runnable {
         */
         while(game.play) {
             repaint();
-            h.move();            
+            h.move(p);            
             try {
                 thread.sleep(10);
             }

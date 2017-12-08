@@ -11,7 +11,7 @@ public class Player
 {
     public int xPos = 400;
     public static int yPos = 600;
-    public static int lives = 1;
+    public static int lives = 3;
     public static boolean hit = false;
 
     ImageIcon newImageSprite = new ImageIcon("ship.png");

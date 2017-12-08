@@ -33,7 +33,7 @@ public class Herd
         }
     }
 
-    public void move()
+    public void move(Player player)
     {
         if (herd[0][colInv -1].xPos > game.WIDTH - 60 || herd[0][0].xPos < 20)
         {
@@ -47,6 +47,12 @@ public class Herd
             {   
                 herd[i][j].xPos += 3 * factor;
                 herd[i][j].yPos += changeY;
+                if (herd[i][j].yPos >= Player.yPos && ( (herd[i][j].xPos >= player.xPos && herd[i][j].xPos <= player.xPos + 64) || (herd[i][j].xPos + 35 >= player.xPos && herd[i][j].xPos + 35 <= player.xPos + 64)))
+                {
+                    Player.lives--;
+                    player.xPos = game.WIDTH/2;
+                    if (Player.lives == 0) {game.play = false;}
+                }
             }
         }
         changeY = 0; 
