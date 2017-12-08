@@ -29,6 +29,7 @@ public class game extends JPanel implements KeyListener, Runnable {
     public int fireRate = 11;
     public int score = 0;
     Vector <Bomb> bombsOnScreen = new Vector <Bomb>(1, 1);
+    Vector <Bullet> bulletsOnScreen = new Vector <Bullet>(1,1);
 
     private static ImageIcon newImageSprite = new ImageIcon("gameOver.png");
     private static Image gameover = newImageSprite.getImage();
@@ -46,12 +47,19 @@ public class game extends JPanel implements KeyListener, Runnable {
         generateBomb(g2);
         drawHerd(g2);
         drawBarriers(g2);
+        generateBullet(g2);
 
         g.drawString("Lives: " + Integer.toString(Player.lives), 10, 20);
         g.drawString("Score: " + Integer.toString(score), 10, 40);
 
-        if(!game.play)
+        if(!game.play || Herd.alive == 0)
         {
+            if (Herd.alive == 0)
+            {
+                newImageSprite = new ImageIcon("win_minion.png");
+                gameover = newImageSprite.getImage();
+
+            }
             g2.drawImage(game.gameover, WIDTH/2, 10, null);
             newImageSprite = new ImageIcon("LOGO-GAME-OVER.png");
             gameover = newImageSprite.getImage();
@@ -61,11 +69,12 @@ public class game extends JPanel implements KeyListener, Runnable {
             
         }
     }
+
     public void generateBomb(Graphics2D g2)
     {
         randomRow = rand.nextInt(Herd.rowInv);
         randomCol = rand.nextInt(Herd.colInv);
-        boolean belowIsHit = randomRow != 2 && h.herd[randomRow +1][randomCol].hit;
+        boolean belowIsHit = randomRow != 2 &&  (!h.herd[randomRow +1][randomCol].hit);
 
         if (randomRow == 2 && (!h.herd[randomRow][randomCol].hit) || belowIsHit)
         { 
@@ -128,10 +137,8 @@ public class game extends JPanel implements KeyListener, Runnable {
                     bombsOnScreen.remove(i);
             }
         }
-
-
-
     }
+
     public void drawBarriers(Graphics2D g2)
     {
         for(int i = 0; i < 12; i++){
@@ -237,6 +244,73 @@ public class game extends JPanel implements KeyListener, Runnable {
         if (key == KeyEvent.VK_SPACE)
         { 
             //shoot bullet
+            bulletsOnScreen.add(new Bullet(p));
+        }
+    }
+
+    public void generateBullet(Graphics2D g2)
+    {
+        Invader tempI;
+        int invaderRange = 35;
+        Bullet tempB;
+        int bulletRange = 30;
+
+        for(int i = 0; i < 12; i++)
+            {
+                for(int j = 0; j < bulletsOnScreen.size(); j++)
+                {
+                    tempB = bulletsOnScreen.elementAt(j);
+                    if ( (tempB.xPos >= b.barrier[i].xPos && (tempB.xPos <= b.barrier[i].xPos + bulletRange)) && (tempB.yPos >= b.barrier[i].yPos && tempB.yPos + bulletRange/2 <= b.barrier[i].yPos + bulletRange) && (!b.barrier[i].hit && !tempB.hit) )
+                        tempB.hit = true;
+                    if ( (tempB.xPos >= b1.barrier[i].xPos && (tempB.xPos <= b1.barrier[i].xPos + bulletRange)) && (tempB.yPos >= b1.barrier[i].yPos && tempB.yPos + bulletRange/2 <= b1.barrier[i].yPos + bulletRange) && (!b1.barrier[i].hit && !tempB.hit) )
+                        tempB.hit = true;
+                    if ( (tempB.xPos >= b2.barrier[i].xPos && (tempB.xPos <= b2.barrier[i].xPos + bulletRange)) && (tempB.yPos >= b2.barrier[i].yPos && tempB.yPos + bulletRange/2 <= b2.barrier[i].yPos + bulletRange) && (!b2.barrier[i].hit && !tempB.hit) )
+                        tempB.hit = true;
+                }
+            }     
+
+        for(int i = 0; i < Herd.rowInv; i++)
+        {
+            for(int j = 0; j < Herd.colInv; j++)
+            {
+                tempI = h.herd[i][j];
+
+                for(int k = 0; k < bulletsOnScreen.size(); k++)
+                {
+                    tempB = bulletsOnScreen.elementAt(k);
+                    if (tempB != null)
+                    {
+                        //if((b.barrier[j].yPos == tempBomb.yPos || b.barrier[j].yPos + 1 == tempBomb.yPos) && ((tempBomb.xPos >= b.barrier[j].xPos && tempBomb.xPos <= b.barrier[j].xPos + bombRange) || (tempBomb.xPos + 25 >= b.barrier[j].xPos && tempBomb.xPos + 25 <= b.barrier[j].xPos + bombRange)) && (!b.barrier[j].hit) && (!tempBomb.hit))
+                            
+                        if ( (tempB.xPos >= tempI.xPos && tempB.xPos + bulletRange/2 <= tempI.xPos + invaderRange) && (tempB.yPos >= tempI.yPos && tempB.yPos + bulletRange/2 <= tempI.yPos + invaderRange) && (!tempI.hit && !tempB.hit) )
+                        {
+                            tempB.hit = true;
+                            tempI.hit = true;
+                            score++;
+                            Herd.alive--;
+                            break;
+                        }
+                    }
+                }
+            }
+         }
+
+            
+
+
+        for(int i = 0; i < bulletsOnScreen.size(); i++)
+        {
+            if( ! bulletsOnScreen.elementAt(i).hit )
+            {
+                g2.drawImage(bulletsOnScreen.elementAt(i).representation, bulletsOnScreen.elementAt(i).xPos, bulletsOnScreen.elementAt(i).yPos, null);
+                bulletsOnScreen.elementAt(i).yPos -= 2;
+            }
+        
+            else
+            {
+                tempB = bulletsOnScreen.elementAt(i);
+                tempB = null;
+            }
         }
     }
 

@@ -14,6 +14,7 @@ public class Herd
     private int factor = 1;
     private int changeY = 0;
     Invader[][] herd = new Invader[rowInv][colInv];
+    public static int alive = rowInv * colInv;
 
     Herd()
     {
@@ -47,7 +48,7 @@ public class Herd
             {   
                 herd[i][j].xPos += 3 * factor;
                 herd[i][j].yPos += changeY;
-                if (herd[i][j].yPos >= Player.yPos && ( (herd[i][j].xPos >= player.xPos && herd[i][j].xPos <= player.xPos + 64) || (herd[i][j].xPos + 35 >= player.xPos && herd[i][j].xPos + 35 <= player.xPos + 64)))
+                if ( (herd[i][j].yPos >= Player.yPos && herd[i][j].yPos + 45 <= Player.yPos + 64) && ( (herd[i][j].xPos >= player.xPos && herd[i][j].xPos <= player.xPos + 64) || (herd[i][j].xPos + 35 >= player.xPos && herd[i][j].xPos + 35 <= player.xPos + 64)))
                 {
                     Player.lives--;
                     player.xPos = game.WIDTH/2;
