@@ -26,7 +26,7 @@ public class game extends JPanel implements KeyListener, Runnable {
     Random rand = new Random();
     public int randomRow;
     public int randomCol;
-    public int fireRate = 11;
+    public int fireRate = 30;
     public int score = 0;
     Vector <Bomb> bombsOnScreen = new Vector <Bomb>(1, 1);
     Vector <Bullet> bulletsOnScreen = new Vector <Bullet>(1,1);
@@ -79,7 +79,11 @@ public class game extends JPanel implements KeyListener, Runnable {
         if (randomRow == 2 && (!h.herd[randomRow][randomCol].hit) || belowIsHit)
         { 
             if(rand.nextInt() % fireRate == 0)
+            {
                 bombsOnScreen.add(new Bomb(h.herd[randomRow][randomCol]));
+                playAudio("bomb.wav");
+            }
+            
         }
 
         Bomb tempBomb;
@@ -160,7 +164,10 @@ public class game extends JPanel implements KeyListener, Runnable {
             {
                 temp = h.herd[i][j];
                 if(!temp.hit)
-                    g2.drawImage(temp.representation, temp.xPos, temp.yPos, null);
+                {  
+                     g2.drawImage(temp.representation, temp.xPos, temp.yPos, null);
+                }
+                
             }
         }
     }
@@ -172,13 +179,12 @@ public class game extends JPanel implements KeyListener, Runnable {
         super.addNotify();
         requestFocus();
     }
-    
-    public void run() {
-        Thread thread = new Thread(this);
-        /*
+
+    public void playBackgroundMusic(String filename)
+    {
         try{
-            File backgroundMusic = new File("mario.mp3");
-            AudioInputStream stream = AudioSystem.getAudioInputStream(backgroundMusic);
+            File audioFile = new File(filename);
+            AudioInputStream stream = AudioSystem.getAudioInputStream(audioFile);
             AudioFormat format = stream.getFormat();
             DataLine.Info info = new DataLine.Info(Clip.class, format);
             Clip audioClip = (Clip) AudioSystem.getLine(info);
@@ -200,8 +206,40 @@ public class game extends JPanel implements KeyListener, Runnable {
             System.out.println("Error playing the audio file.");
             ex.printStackTrace();
         }
-        */
-        while(game.play) {
+    }
+
+    public void playAudio(String filename)
+    {
+        try{
+            File audioFile = new File(filename);
+            AudioInputStream stream = AudioSystem.getAudioInputStream(audioFile);
+            AudioFormat format = stream.getFormat();
+            DataLine.Info info = new DataLine.Info(Clip.class, format);
+            Clip audioClip = (Clip) AudioSystem.getLine(info);
+            audioClip.open(stream);
+            audioClip.start();
+        }
+
+        catch (UnsupportedAudioFileException ex){
+            System.out.println("The specified audio file is not supported.");
+            ex.printStackTrace();
+        }
+
+        catch (LineUnavailableException ex){
+            System.out.println("Audio line for playing back is unavailable.");
+            ex.printStackTrace();
+        }
+
+        catch (IOException ex){
+            System.out.println("Error playing the audio file.");
+            ex.printStackTrace();
+        }
+    }
+
+    public void run() {
+        Thread thread = new Thread(this);
+        playBackgroundMusic("bgmusic.wav");      
+        while(game.play) {      
             repaint();
             h.move(p);            
             try {
@@ -245,6 +283,7 @@ public class game extends JPanel implements KeyListener, Runnable {
         { 
             //shoot bullet
             bulletsOnScreen.add(new Bullet(p));
+            playAudio("playershot.wav"); 
         }
     }
 
@@ -280,8 +319,6 @@ public class game extends JPanel implements KeyListener, Runnable {
                     tempB = bulletsOnScreen.elementAt(k);
                     if (tempB != null)
                     {
-                        //if((b.barrier[j].yPos == tempBomb.yPos || b.barrier[j].yPos + 1 == tempBomb.yPos) && ((tempBomb.xPos >= b.barrier[j].xPos && tempBomb.xPos <= b.barrier[j].xPos + bombRange) || (tempBomb.xPos + 25 >= b.barrier[j].xPos && tempBomb.xPos + 25 <= b.barrier[j].xPos + bombRange)) && (!b.barrier[j].hit) && (!tempBomb.hit))
-                            
                         if ( (tempB.xPos >= tempI.xPos && tempB.xPos + bulletRange/2 <= tempI.xPos + invaderRange) && (tempB.yPos >= tempI.yPos && tempB.yPos + bulletRange/2 <= tempI.yPos + invaderRange) && (!tempI.hit && !tempB.hit) )
                         {
                             tempB.hit = true;
